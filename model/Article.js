@@ -16,11 +16,19 @@ const articleSchema = new mongoose.Schema({
     },
     date: {
         type: Date,
-        required: true
+        default: Date.now
     },
     author: {
-        type: User,
+        type: User.schema,
         required: true
+    },
+    likes: {
+        type: User.schema,
+        default: []
+    },
+    dislikes: {
+        type: User.schema,
+        default: []
     }
 });
 

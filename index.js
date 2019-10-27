@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const cors = require("cors");
 
 dotenv.config();
 
@@ -13,13 +14,16 @@ mongoose.connect(
 
 //Route import
 const authRoute = require("./routes/auth");
-const posts = require("./routes/posts");
+const articles = require("./routes/articles");
+const users = require("./routes/users");
 
 app.use(express.json());
 
+app.use(cors()) // include before other routes
+
 //svi iz auth routea imaju prefix /api/user/
-app.use("/api/user", authRoute);
-app.use("/", posts);
-app.use("/public", posts);
+app.use("/api/auth", authRoute);
+app.use("/api/users", users);
+app.use("/api/articles", articles);
 
 app.listen(3000, () => console.log("Server running"));

@@ -38,7 +38,7 @@ router.post("/register", async(req, res) => {
 router.post("/login", async(req, res) => {
     //validacija requesta
     const { error } = loginValidation(req.body);
-    if (error) return res.status(400).send(error);
+    if (error) return res.status(400).send(error + " " + req.body);
 
     //provjera je li taj user u db
     const user = await User.findOne({ email: req.body.email });
@@ -53,11 +53,14 @@ router.post("/login", async(req, res) => {
     }
 
     //create and assign token
-    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET); //dodaj role
-    res.header('auth-token', token).send(token);
+    const token = jwt.sign({
+            _id: user._id,
+            expires: Math.floor(Date.now() / 1000) + (60 * 60)
+        },
+        process.env.TOKEN_SECRET
+    ); //dodaj role
 
+    res.header("auth-token", token).send({ "token": token });
 });
-
-
 
 module.exports = router;
