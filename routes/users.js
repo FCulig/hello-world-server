@@ -7,6 +7,13 @@ router.get('', verify, async(req, res) => {
     res.send(users);
 });
 
+router.get('/:userId', verify, async(req, res) => {
+    let user = await User.findOne({ _id: req.params.userId });
+    console.log(user);
+    res.send(user);
+});
+
+
 router.post('/writer/promote', verify, async(req, res) => {
     User.update({ email: req.body.email }, { role: "WRITER" }, function(err, numberAffected, rawResponse) {
         //fn ako je uspjesna promjena

@@ -29,7 +29,7 @@ router.post("/register", async(req, res) => {
 
     try {
         const savedUser = await user.save();
-        res.send(savedUser);
+        res.send({ success: 1 });
     } catch (err) {
         res.status(400).send(err);
     }
@@ -55,12 +55,14 @@ router.post("/login", async(req, res) => {
     //create and assign token
     const token = jwt.sign({
             _id: user._id,
-            expires: Math.floor(Date.now() / 1000) + (60 * 60)
+            expires: Math.floor(Date.now() / 1000) + 60 * 60
         },
         process.env.TOKEN_SECRET
     ); //dodaj role
 
-    res.header("auth-token", token).send({ "token": token });
+    res
+        .header("auth-token", token)
+        .send({ "token": token, "username": user.name, "email": user.email });
 });
 
 module.exports = router;

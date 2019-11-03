@@ -1,9 +1,16 @@
 const mongoose = require("mongoose");
+
 const User = require("./User");
+const Category = require("./Category");
+const Comment = require("./Comment");
 
 const articleSchema = new mongoose.Schema({
     title: {
         type: String,
+        required: true
+    },
+    category: {
+        type: Category.schema,
         required: true
     },
     shortDescription: {
@@ -22,14 +29,16 @@ const articleSchema = new mongoose.Schema({
         type: User.schema,
         required: true
     },
-    likes: {
-        type: User.schema,
-        default: []
+    imagePath: {
+        type: String,
+        required: true
     },
-    dislikes: {
+    likes: [User.schema],
+    dislikes: [{
         type: User.schema,
         default: []
-    }
+    }],
+    comments: [Comment.schema]
 });
 
 module.exports = mongoose.model("Article", articleSchema);
