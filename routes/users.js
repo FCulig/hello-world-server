@@ -9,31 +9,35 @@ router.get('', verify, async(req, res) => {
 
 router.get('/:userId', verify, async(req, res) => {
     let user = await User.findOne({ _id: req.params.userId });
-    console.log(user);
     res.send(user);
 });
 
 
-router.post('/writer/promote', verify, async(req, res) => {
-    User.update({ email: req.body.email }, { role: "WRITER" }, function(err, numberAffected, rawResponse) {
-        //fn ako je uspjesna promjena
-        console.log("ERROR: promocija usera");
+router.post('/writer/promote/:userId', verify, async(req, res) => {
+
+    const us = await User.findOne({ _id: req.params.userId });
+    if (!us) return res.status(404).send("User with that ID does not exist!");
+    
+    if (us.role === "WRITER") return res.status(400).send("User is already writer!");
+
+    User.update({ _id: req.params.userId }, { role: "WRITER" }, function(err, numberAffected, rawResponse) {
         console.log(err);
-        console.log(numberAffected);
-        console.log(rawResponse);
     })
-    res.send(req.body.email);
+
+    res.send({"promoted": req.params.userId});
 });
 
-router.post('/writer/demote', verify, async(req, res) => {
-    User.update({ email: req.body.email }, { role: "USER" }, function(err, numberAffected, rawResponse) {
-        //fn ako je uspjesna promjena
-        console.log("ERROR: promocija usera");
+router.post('/writer/demote/:userId', verify, async(req, res) => {
+
+    const us = await User.findOne({ _id: req.params.userId });
+    if (!us) return res.status(404).send("User with that ID does not exist!");
+
+    if (us.role === "USER") return res.status(400).send("User already has role USER!");
+
+    User.update({ _id: req.params.userId }, { role: "USER" }, function(err, numberAffected, rawResponse) {
         console.log(err);
-        console.log(numberAffected);
-        console.log(rawResponse);
     })
-    res.send(req.body.email);
+    res.send({"demoted": req.params.userId});
 });
 
 module.exports = router;
