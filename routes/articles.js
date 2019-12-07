@@ -55,6 +55,23 @@ router.get("/", async(req, res) => {
     res.send(articles);
 });
 
+router.get("/:articleId", async(req, res) => {
+    const art = await Article.findOne({ _id: req.params.articleId });
+    if (!art) {
+        res.sendStatus(404);
+    }
+
+    res.send(art);
+});
+
+router.get("/img/:articleId", async(req, res) => {
+    const art = await Article.findOne({ _id: req.params.articleId });
+    if (!art) {
+        res.sendStatus(404);
+    }
+    res.sendFile(path.join(__dirname, "/../"+art.imagePath));
+});
+
 router.get("/top", async(req, res) => {
     console.log(req.query.n);
     console.log(req.query.cat);
@@ -224,6 +241,15 @@ router.post("/:userId/dislike/:articleId", verify, async(req, res) => {
 
     const arti = await Article.findOne({ _id: req.params.articleId });
     res.send(arti);
+});
+
+router.get("/category/:catId", async(req, res) => {
+    const cat = await Category.findOne({ _id: req.params.catId });
+    if (!cat) return res.status(404).send("Category does not exists!");
+
+    let articles = await Article.find({ category: cat });
+    
+    res.send(articles);
 });
 
 
