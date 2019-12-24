@@ -11,10 +11,10 @@ const Category = require("../model/Category");
 const Comment = require("../model/Comment");
 
 const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, 'uploads/article-images/')
     },
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         cb(null, uuid.v4() + Date.now() + path.extname(file.originalname));
     }
 })
@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 //TODO: zastita endpointa
-router.post("/", upload.single('image'), async(req, res) => {
+router.post("/", upload.single('image'), async (req, res) => {
     const { error } = articleValidation(req.body);
     if (error) return res.status(400).send(error);
 
@@ -50,12 +50,12 @@ router.post("/", upload.single('image'), async(req, res) => {
     }
 });
 
-router.get("/", async(req, res) => {
+router.get("/", async (req, res) => {
     const articles = await Article.find();
     res.send(articles);
 });
 
-router.get("/:articleId", async(req, res) => {
+router.get("/:articleId", async (req, res) => {
     const art = await Article.findOne({ _id: req.params.articleId });
     if (!art) {
         res.sendStatus(404);
@@ -64,15 +64,15 @@ router.get("/:articleId", async(req, res) => {
     res.send(art);
 });
 
-router.get("/img/:articleId", async(req, res) => {
+router.get("/img/:articleId", async (req, res) => {
     const art = await Article.findOne({ _id: req.params.articleId });
     if (!art) {
         res.sendStatus(404);
     }
-    res.sendFile(path.join(__dirname, "/../"+art.imagePath));
+    res.sendFile(path.join(__dirname, "/../" + art.imagePath));
 });
 
-router.get("/top", async(req, res) => {
+router.get("/top", async (req, res) => {
     console.log(req.query.n);
     console.log(req.query.cat);
 
@@ -87,7 +87,7 @@ router.get("/top", async(req, res) => {
     res.send(articles.slice(0, req.query.n));
 });
 
-router.post("/:userId/like/:articleId", verify, async(req, res) => {
+router.post("/:userId/like/:articleId", verify, async (req, res) => {
     const art = await Article.findOne({ _id: req.params.articleId });
     if (!art) {
         res.sendStatus(404);
@@ -102,7 +102,6 @@ router.post("/:userId/like/:articleId", verify, async(req, res) => {
 
     if (art.likes.length > 0) {
         art.likes.forEach(element => {
-            console.log(element);
             if (element.id == us.id) {
                 update = false;
             }
@@ -113,11 +112,11 @@ router.post("/:userId/like/:articleId", verify, async(req, res) => {
     let id = req.params.articleId
     if (update) {
         Article.findOneAndUpdate({ _id: id }, {
-                $push: {
-                    likes: us
-                }
-            },
-            function(err, numAffected, raw) {
+            $push: {
+                likes: us
+            }
+        },
+            function (err, numAffected, raw) {
                 if (err) {
                     res.send(err);
                 }
@@ -125,11 +124,11 @@ router.post("/:userId/like/:articleId", verify, async(req, res) => {
         );
     } else {
         await Article.findOneAndUpdate({ _id: id }, {
-                $pullAll: {
-                    likes: [us]
-                }
-            },
-            function(err, numAffected, raw) {
+            $pullAll: {
+                likes: [us]
+            }
+        },
+            function (err, numAffected, raw) {
                 if (err) {
                     res.send(err);
                 }
@@ -139,7 +138,7 @@ router.post("/:userId/like/:articleId", verify, async(req, res) => {
 
     update = false;
     if (art.dislikes.length > 0) {
-        art.dislikes.forEach(async(element) => {
+        art.dislikes.forEach(async (element) => {
             if (element.id == us.id) {
                 update = true;
             }
@@ -148,11 +147,11 @@ router.post("/:userId/like/:articleId", verify, async(req, res) => {
 
     if (update) {
         await Article.findOneAndUpdate({ _id: id }, {
-                $pullAll: {
-                    dislikes: [us]
-                }
-            },
-            function(err, numAffected, raw) {
+            $pullAll: {
+                dislikes: [us]
+            }
+        },
+            function (err, numAffected, raw) {
                 if (err) {
                     console.log(err);
                     res.send(err);
@@ -165,7 +164,7 @@ router.post("/:userId/like/:articleId", verify, async(req, res) => {
     res.send(arti);
 });
 
-router.post("/:userId/dislike/:articleId", verify, async(req, res) => {
+router.post("/:userId/dislike/:articleId", verify, async (req, res) => {
     const art = await Article.findOne({ _id: req.params.articleId });
     if (!art) {
         res.sendStatus(404);
@@ -180,7 +179,6 @@ router.post("/:userId/dislike/:articleId", verify, async(req, res) => {
 
     if (art.dislikes.length > 0) {
         art.dislikes.forEach(element => {
-            console.log(element);
             if (element.id == us.id) {
                 update = false;
             }
@@ -191,11 +189,11 @@ router.post("/:userId/dislike/:articleId", verify, async(req, res) => {
     let id = req.params.articleId
     if (update) {
         Article.findOneAndUpdate({ _id: id }, {
-                $push: {
-                    dislikes: us
-                }
-            },
-            function(err, numAffected, raw) {
+            $push: {
+                dislikes: us
+            }
+        },
+            function (err, numAffected, raw) {
                 if (err) {
                     res.send(err);
                 }
@@ -203,11 +201,11 @@ router.post("/:userId/dislike/:articleId", verify, async(req, res) => {
         );
     } else {
         await Article.findOneAndUpdate({ _id: id }, {
-                $pullAll: {
-                    dislikes: [us]
-                }
-            },
-            function(err, numAffected, raw) {
+            $pullAll: {
+                dislikes: [us]
+            }
+        },
+            function (err, numAffected, raw) {
                 if (err) {
                     res.send(err);
                 }
@@ -217,7 +215,7 @@ router.post("/:userId/dislike/:articleId", verify, async(req, res) => {
 
     update = false;
     if (art.likes.length > 0) {
-        art.likes.forEach(async(element) => {
+        art.likes.forEach(async (element) => {
             if (element.id == us.id) {
                 update = true;
             }
@@ -226,11 +224,11 @@ router.post("/:userId/dislike/:articleId", verify, async(req, res) => {
 
     if (update) {
         await Article.findOneAndUpdate({ _id: id }, {
-                $pullAll: {
-                    likes: [us]
-                }
-            },
-            function(err, numAffected, raw) {
+            $pullAll: {
+                likes: [us]
+            }
+        },
+            function (err, numAffected, raw) {
                 if (err) {
                     console.log(err);
                     res.send(err);
@@ -243,13 +241,48 @@ router.post("/:userId/dislike/:articleId", verify, async(req, res) => {
     res.send(arti);
 });
 
-router.get("/category/:catId", async(req, res) => {
+router.get("/category/:catId", async (req, res) => {
     const cat = await Category.findOne({ _id: req.params.catId });
     if (!cat) return res.status(404).send("Category does not exists!");
 
     let articles = await Article.find({ category: cat });
-    
+
     res.send(articles);
+});
+
+router.post("/:userId/comment/:articleId", verify, async (req, res) => {
+    const art = await Article.findOne({ _id: req.params.articleId });
+    if (!art) {
+        res.sendStatus(404);
+    }
+
+    const us = await User.findById({ _id: req.params.userId });
+    if (!us) {
+        res.sendStatus(404);
+    }
+
+    const comment = new Comment({
+        comment: req.body.comment,
+        user: us
+    });
+
+    await Article.findOneAndUpdate({ _id: req.params.articleId }, {
+        $push: {
+            comments: comment
+        }
+    });
+
+    const arti = await Article.findOne({ _id: req.params.articleId });
+    res.send(arti);
+});
+
+router.get("/:articleId/comments/", async (req, res) => {
+    const art = await Article.findOne({ _id: req.params.articleId });
+    if (!art) {
+        res.sendStatus(404);
+    }
+    
+    res.send(art.comments);
 });
 
 
