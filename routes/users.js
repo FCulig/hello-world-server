@@ -7,7 +7,7 @@ router.get('', verify, async(req, res) => {
     res.send(users);
 });
 
-router.get('/:userId', verify, async(req, res) => {
+router.get('/:userId', async(req, res) => {
     let user = await User.findOne({ _id: req.params.userId });
     res.send(user);
 });

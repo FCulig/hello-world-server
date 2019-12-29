@@ -52,7 +52,12 @@ router.post("/", upload.single('image'), async (req, res) => {
 
 router.get("/", async (req, res) => {
     const articles = await Article.find();
-    res.send(articles);
+
+    if (req.query.n) {
+        res.send(articles.slice(0, req.query.n));
+    } else {
+        res.send(articles);
+    }
 });
 
 router.get("/:articleId", async (req, res) => {
@@ -70,21 +75,6 @@ router.get("/img/:articleId", async (req, res) => {
         res.sendStatus(404);
     }
     res.sendFile(path.join(__dirname, "/../" + art.imagePath));
-});
-
-router.get("/top", async (req, res) => {
-    console.log(req.query.n);
-    console.log(req.query.cat);
-
-    const category = await Category.findOne({ _id: req.query.cat });
-    if (!category) return res.status(404).send("Category with that ID does not exist!");
-
-    let articles = await Article.find({ category: category });
-    if (articles.length < req.query.n) return res.status(404).send("There is not enought articles!");
-
-    articles.sort(compare);
-
-    res.send(articles.slice(0, req.query.n));
 });
 
 router.post("/:userId/like/:articleId", verify, async (req, res) => {
@@ -247,7 +237,11 @@ router.get("/category/:catId", async (req, res) => {
 
     let articles = await Article.find({ category: cat });
 
-    res.send(articles);
+    if(req.query.n){
+        res.send(articles.slice(0, req.query.n));
+    }else{
+        res.send(articles);
+    }
 });
 
 router.post("/:userId/comment/:articleId", verify, async (req, res) => {
@@ -281,8 +275,30 @@ router.get("/:articleId/comments/", async (req, res) => {
     if (!art) {
         res.sendStatus(404);
     }
-    
+
     res.send(art.comments);
+});
+
+router.get("/bestarticles/:categoryId", async (req, res) => {
+
+    if (req.params.categoryId === "all") {
+        let articles = await Article.find();
+        if (articles.length < req.query.n) return res.status(404).send("There is not enought articles!");
+
+        articles.sort(compare);
+        res.send(articles.slice(0, req.query.n));
+    } else {
+        const category = await Category.findOne({ _id: req.params.categoryId });
+        if (!category) return res.status(404).send("Category with that ID does not exist!");
+
+        let articles = await Article.find({ category: category });
+        if (articles.length < req.query.n) return res.status(404).send("There is not enought articles!");
+
+        articles.sort(compare);
+        res.send(articles.slice(0, req.query.n));
+
+    }
+
 });
 
 
