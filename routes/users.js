@@ -12,6 +12,13 @@ router.get('/:userId', async(req, res) => {
     res.send(user);
 });
 
+router.delete('/:userId', verify, async(req, res) => {
+
+    const us = await User.findOneAndDelete({ _id: req.params.userId });
+    if (!us) return res.status(404).send("User with that ID does not exist!");
+
+    res.send({"deleted": req.params.userId});
+});
 
 router.post('/writer/promote/:userId', verify, async(req, res) => {
 

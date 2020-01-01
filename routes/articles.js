@@ -4,6 +4,7 @@ const { articleValidation, commentValidation } = require("../validation");
 const multer = require("multer");
 const uuid = require("uuid");
 const path = require("path");
+const fs = require('fs')
 
 const Article = require("../model/Article");
 const User = require("../model/User");
@@ -67,6 +68,41 @@ router.get("/:articleId", async (req, res) => {
     }
 
     res.send(art);
+});
+
+router.delete("/:articleId", async (req, res) => {
+    const art = await Article.findOneAndDelete({ _id: req.params.articleId });
+    if (!art) {
+        res.sendStatus(404);
+    }
+
+    try {
+        fs.unlinkSync(art.imagePath)
+    } catch (err) {
+        console.error(err)
+    }
+
+    res.send({ "deleted": req.params.articleId });
+});
+
+router.get("/user/:userId", async (req, res) => {
+
+    const user = await User.findOne({ _id: req.params.userId });
+    if (!user) {
+        res.sendStatus(404);
+    }
+
+    const art = await Article.find();
+
+    let arts = [];
+
+    for (let i = 0; i < art.length; i++) {
+        if (art[i].author._id == req.params.userId) {
+            arts.push(art[i])
+        }
+    }
+
+    res.send(arts);
 });
 
 router.get("/img/:articleId", async (req, res) => {
@@ -237,9 +273,9 @@ router.get("/category/:catId", async (req, res) => {
 
     let articles = await Article.find({ category: cat });
 
-    if(req.query.n){
+    if (req.query.n) {
         res.send(articles.slice(0, req.query.n));
-    }else{
+    } else {
         res.send(articles);
     }
 });

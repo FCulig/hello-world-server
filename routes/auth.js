@@ -62,7 +62,7 @@ router.post("/login", async(req, res) => {
 
     res
         .header("auth-token", token)
-        .send({ "token": token, "username": user.name, "email": user.email, "id": user._id });
+        .send({ "token": token, "username": user.name, "email": user.email, "id": user._id, "role":user.role });
 });
 
 module.exports = router;
