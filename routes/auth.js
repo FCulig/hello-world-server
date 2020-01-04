@@ -14,7 +14,7 @@ router.post("/register", async(req, res) => {
     if (emailExists) {
         return res.status(400).send("Email already exists!");
     }
-    //dodaj za username i ostale
+    //TODO:dodaj za username i ostale
 
     //hashiranje passworda
     const salt = await bcrypt.genSalt(10);
@@ -36,29 +36,26 @@ router.post("/register", async(req, res) => {
 });
 
 router.post("/login", async(req, res) => {
-    //validacija requesta
+    
     const { error } = loginValidation(req.body);
     if (error) return res.status(400).send(error + " " + req.body);
 
-    //provjera je li taj user u db
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
         return res.status(400).send("Invalid email or password!");
     }
 
-    //if password is correct
     const validPass = await bcrypt.compare(req.body.password, user.password);
     if (!validPass) {
         return res.status(400).send("Invalid email or password!");
     }
 
-    //create and assign token
     const token = jwt.sign({
             _id: user._id,
             expires: Math.floor(Date.now() / 1000) + 60 * 60
         },
         process.env.TOKEN_SECRET
-    ); //dodaj role
+    );
 
     res
         .header("auth-token", token)
