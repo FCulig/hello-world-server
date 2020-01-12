@@ -279,7 +279,7 @@ async function getArticles(res) {
     const articles = await Article.find();
 
     if (articles) {
-        return articles;
+        return articles.reverse();
     } else {
         if (res) {
             res.status(404).send("There is no articles!");

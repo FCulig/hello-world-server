@@ -20,7 +20,7 @@ router.post('/writer/promote/:userId', verify, async (req, res) => {
 
     if (us.role === "WRITER") return res.status(400).send("User is already writer!");
 
-    User.update({ _id: req.params.userId }, { role: "WRITER" }, function (err, numberAffected, rawResponse) {
+    User.updateOne({ _id: req.params.userId }, { role: "WRITER" }, function (err, numberAffected, rawResponse) {
         console.error(err);
         res.status(400).send(err)
     })
@@ -33,7 +33,7 @@ router.post('/writer/demote/:userId', verify, async (req, res) => {
 
     if (us.role === "USER") return res.status(400).send("User already has role USER!");
 
-    User.update({ _id: req.params.userId }, { role: "USER" }, function (err, numberAffected, rawResponse) {
+    User.updateOne({ _id: req.params.userId }, { role: "USER" }, function (err, numberAffected, rawResponse) {
         console.error(err);
         res.status(400).send(err)
     })
@@ -70,7 +70,7 @@ async function getUser(userId, res) {
 }
 
 async function deleteUser(userId, res) {
-    const user = await User.findOneAndDelete({ _id: req.params.userId });
+    const user = await User.findOneAndDelete({ _id: userId });
 
     if (user) {
         return user;
